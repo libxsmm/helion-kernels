@@ -1,9 +1,7 @@
 import torch
-import torch.nn as nn
 import helion
 import helion.language as hl
 from helion._testing import DEVICE, run_example
-from torch import Tensor
 import math
 
 
@@ -67,7 +65,9 @@ class Model:
     def __init__(self):
         pass
 
-    def forward(self, Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor
+    ) -> torch.Tensor:
         out = torch.nn.functional.scaled_dot_product_attention(Q, K, V)
         return out
 
@@ -78,25 +78,39 @@ def pytorch_baseline(Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor) -> torch
     return model.forward(Q, K, V)
 
 
-def check(batch_size: int, num_heads: int, sequence_length: int, embedding_dimension: int) -> None:
+def check(
+    batch_size: int, num_heads: int, sequence_length: int, embedding_dimension: int
+) -> None:
     """
     Checks the correctness of the scaled dot-product attention kernel against PyTorch baseline.
-    
+
     Args:
         batch_size: Batch size
         num_heads: Number of attention heads
         sequence_length: Sequence length
         embedding_dimension: Embedding dimension per head
     """
-    Q = torch.randn([batch_size, num_heads, sequence_length, embedding_dimension], device=DEVICE, dtype=torch.float16)
-    K = torch.randn([batch_size, num_heads, sequence_length, embedding_dimension], device=DEVICE, dtype=torch.float16)
-    V = torch.randn([batch_size, num_heads, sequence_length, embedding_dimension], device=DEVICE, dtype=torch.float16)
-    
+    Q = torch.randn(
+        [batch_size, num_heads, sequence_length, embedding_dimension],
+        device=DEVICE,
+        dtype=torch.float16,
+    )
+    K = torch.randn(
+        [batch_size, num_heads, sequence_length, embedding_dimension],
+        device=DEVICE,
+        dtype=torch.float16,
+    )
+    V = torch.randn(
+        [batch_size, num_heads, sequence_length, embedding_dimension],
+        device=DEVICE,
+        dtype=torch.float16,
+    )
+
     # Test scaled dot-product attention
     run_example(
         lambda Q, K, V: scaled_dot_product_attention_kernel(Q, K, V),
         lambda Q, K, V: pytorch_baseline(Q, K, V),
-        (Q, K, V)
+        (Q, K, V),
     )
 
 
@@ -108,7 +122,7 @@ def main() -> None:
     num_heads = 32
     sequence_length = 1024
     embedding_dimension = 64
-    
+
     check(batch_size, num_heads, sequence_length, embedding_dimension)
 
 

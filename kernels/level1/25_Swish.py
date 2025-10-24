@@ -2,7 +2,6 @@ import torch
 import helion
 import helion.language as hl
 from helion._testing import DEVICE, run_example
-from torch import Tensor
 
 
 @helion.kernel(
@@ -12,10 +11,10 @@ def swish_kernel(x: torch.Tensor) -> torch.Tensor:
     """
     Applies Swish activation to the input tensor using Helion.
     Swish(x) = x * sigmoid(x)
-    
+
     Args:
         x: Input tensor of any shape
-    
+
     Returns:
         Output tensor with Swish applied, same shape as input
     """
@@ -23,16 +22,16 @@ def swish_kernel(x: torch.Tensor) -> torch.Tensor:
     original_shape = x.shape
     x_flat = x.view(-1)
     total_elements = x_flat.size(0)
-    
+
     out_flat = torch.empty_like(x_flat)
-    
+
     for tile_idx in hl.tile(total_elements):
         # Apply Swish: x * sigmoid(x)
         input_slice = x_flat[tile_idx]
         sigmoid_slice = torch.sigmoid(input_slice)
         output_slice = input_slice * sigmoid_slice
         out_flat[tile_idx] = output_slice
-    
+
     return out_flat.view(original_shape)
 
 
@@ -40,9 +39,10 @@ class Model:
     """
     Simple model that performs a Swish activation.
     """
+
     def __init__(self):
         pass
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Applies Swish activation to the input tensor.
@@ -65,13 +65,13 @@ def pytorch_baseline(x: torch.Tensor) -> torch.Tensor:
 def check(batch_size: int, dim: int) -> None:
     """
     Checks the correctness of the Swish kernel against PyTorch baseline.
-    
+
     Args:
         batch_size: Batch dimension size
         dim: Feature dimension size
     """
     x = torch.randn([batch_size, dim], device=DEVICE, dtype=torch.float32)
-    
+
     # Test Swish activation
     run_example(swish_kernel, pytorch_baseline, (x,))
 
