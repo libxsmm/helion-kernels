@@ -1,3 +1,6 @@
+**Archived and no longer maintained.**  
+Future kernels should go to: [AI-bench](https://github.com/libxsmm/AI-bench)
+
 # Helion Kernels
 A collection of Helion kernels and their equivalent PyTorch models with example inputs to measure their performance.
 
